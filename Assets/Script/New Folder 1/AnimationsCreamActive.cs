@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class AnimationsCreamActive : BaseMoveTowards
 {
+    private RectTransform handTransform;
     [SerializeField] private Image sprite;
     [SerializeField] private RectTransform target;
     [SerializeField] private HandRectTransformController controller;
@@ -13,7 +14,7 @@ public class AnimationsCreamActive : BaseMoveTowards
     }
     public void StartAnimations()
     {
-        GetTweenRectTransform(target, duration).SetLoops(2, LoopType.Yoyo).OnStepComplete(() => DeactiveImage());
+        GetTweenRectTransform(handTransform, target, duration).SetLoops(2, LoopType.Yoyo).OnStepComplete(() => DeactiveImage());
     }
     private void DeactiveImage()
     {
