@@ -5,64 +5,60 @@ using System.Linq;
 
 public class AddTowardsTarget : BaseMoveTowards, ICommand
 {
-    private RectTransform addTarget;
-    private RectTransform handRectTransform;
-    private List<Vector3> previousPosition = new List<Vector3>();
-    private RectTransform thisRect;
-    private Vector3 defaultPosition;
-    public AddTowardsTarget(TweenRectTransformComponent component, RectTransform handRectTransform, List<Vector3> previousPosition, RectTransform addTarget, RectTransform thisRect)
+    private ModelObjectAdded model;
+    public AddTowardsTarget(ModelObjectAdded model)
     {
-        this.addTarget = addTarget;
-        this.handRectTransform = handRectTransform;
-        this.previousPosition = previousPosition;
-        this.thisRect = thisRect;
+        this.model = model;
     }
     // Выполняет перемещение к начальному таргету, затем к добавленному
-    public Tween Execute(float duration)
+    public void Execute(float duration)
     {
         AddVector3();
-        return GetTweenRectTransform(thisRect, duration);
+        GetTweenRectTransform(model.handRectTransform, model.thisRectTransform, duration).OnStepComplete(() => GetPositionHand(model.thisRectTransform)).OnComplete(() => StartTweenMoveTowardsTransformAddedTarget(duration));
     }
     // Возвращает прошлую позицию hand
     public void Undo(float duration)
     {
-        Vector3 pre = previousPosition.Last();
-        RollBackTransformPosition(pre, duration).OnComplete(() => SetDefaultPosition()).OnPlay(() => Undo(duration));
+        Vector3 pre = model.previousPosition.Last();
+        RollBackTransformPosition(model.handRectTransform, pre, duration).OnComplete(() => SetDefaultPosition()).OnPlay(() => Undo(duration));
     }
     // Сохрвняет Vector3 в List
     private void AddVector3()
     {
-        previousPosition.Add(handRectTransform.position);
+        model.previousPosition.Add(model.handRectTransform.position);
     }
-    private Tween RollBackTransformPosition(Vector3 vector,float duration)
+    private Tween RollBackTransformPosition(RectTransform hand, Vector3 vector,float duration)
     {
-        return handRectTransform.DOMove(vector, duration).SetEase(Ease.Linear).OnStepComplete(() => RemoveVector(vector));
+        return HandDefaultPosition(hand,vector,duration).OnStepComplete(() => RemoveVector(vector));
     }
     // Получает позицию hand и следует за ней
     private void GetPositionHand(RectTransform target)
     {
-        defaultPosition = target.position;
-        target.position = handRectTransform.position;
-        target.SetParent(handRectTransform);
+        target.position = model.handRectTransform.position;
+        target.SetParent(model.handRectTransform);
     }
     // Устанавливает взятому объекту его изначальную позицию
     private void SetDefaultPosition()
     {
-        if (thisRect.parent != GameObject.FindGameObjectWithTag("Shelf").transform)
+        if (model.thisRectTransform.parent != GameObject.FindGameObjectWithTag("Shelf").transform)
         {
-            thisRect.SetParent(GameObject.FindGameObjectWithTag("Shelf").transform);
-            thisRect.position = defaultPosition;
+            model.thisRectTransform.SetParent(GameObject.FindGameObjectWithTag("Shelf").transform);
+            model.thisRectTransform.position = model.handRectTransform.position;
         }
+    }
+    private Tween HandDefaultPosition(RectTransform hand,Vector3 defaultPosition, float duration)
+    {
+        return hand.DOMove(defaultPosition, duration).SetEase(Ease.Linear);
     }
     // Удаляет Vector3 из списка
     private Vector3 RemoveVector(Vector3 vector)
     {
-        previousPosition.Remove(vector);
+        model.previousPosition.Remove(vector);
         return vector;
     }
     // Начинает движение к добавленному таргету
     private Tween StartTweenMoveTowardsTransformAddedTarget(float duration)
     {
-        return GetTweenRectTransform(addTarget, duration).OnPlay(() => AddVector3());
+        return GetTweenRectTransform(model.handRectTransform, model.addTarget, duration).OnPlay(() => AddVector3());
     }
 }
