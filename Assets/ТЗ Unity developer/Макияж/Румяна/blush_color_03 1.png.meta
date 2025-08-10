@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5b85efbc555410c45ade5d897ce62fb5
+guid: 21b13ffbd0190d442b47a9108e5b1f2e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -134,7 +134,28 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: blush_color_03_1
+      rect:
+        serializedVersion: 2
+        x: 846
+        y: 3303
+        width: 354
+        height: 154
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8f738b37e6f633d4bac98aab50ac39d6
+      internalID: 664500564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -145,7 +166,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      blush_color_03_1: 664500564
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
