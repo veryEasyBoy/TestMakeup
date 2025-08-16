@@ -1,104 +1,58 @@
-using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class FaceZone : MonoBehaviour
 {
     [Header("Image for change")]
-    [SerializeField] private Image sprite;
-    [Header("Target for hand move towards")]
-    [SerializeField] private RectTransform targetToward;
-    [Header("Set MakeupItem")]
-    [SerializeField] private MakeupItems makeUpItem;
-    [Header("Duration animation")]
-    [SerializeField] private float duration;
-    [SerializeField] private GameObject nextStage;
+
+    [SerializeField] private Image spriteAcne;
+    [SerializeField] private Image spriteShadow;
+    [SerializeField] private Image spriteLips;
+
+    [Header("Button for next stage")]
+
+    [FormerlySerializedAs("nextStage")]
+    [SerializeField] private GameObject nextStageButton;
+
+    [Header("Set objects with GetComponentsInChildren<Image> \n for clean makeup")]
+    [SerializeField] private GameObject[] makeupClean;
 
     private RectTransform handTransform;
-    private Collider2D myCollider;
-    private bool isPress = false;
+    private Brush brush;
+    private Lipstick lipstick;
 
     private void Awake()
     {
-        myCollider = GetComponent<Collider2D>();
+        brush = GameObject.FindGameObjectWithTag("Brush").GetComponent<Brush>();
+        lipstick = GameObject.FindGameObjectWithTag("Lipstick").GetComponent<Lipstick>();
         handTransform = GameObject.FindGameObjectWithTag("Player").GetComponent<RectTransform>();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void CleanFace()
     {
-        if (collision.CompareTag("Cream"))
-        {
-            StartCreamAnimations(collision, -100f, 0, 0);
-            return;
-        }
-        if (collision.CompareTag("Brush"))
-        {
-            StartBrushAnimations(collision, 200f, -100f, -300f);
-            return;
-        }
+        foreach (GameObject makeup in makeupClean)
+            foreach (Image image in makeup.GetComponentsInChildren<Image>())
+                image.enabled = false;
     }
 
-    public void ActivateToColliderZone() => myCollider.enabled = true;
-
-    public void DeactivateToColliderZone() => myCollider.enabled = false;
-
-    private void StartCreamAnimations(Collider2D collision, float newPositionX, float transformPositionX, float positionY)
+    public void SetShadow()
     {
-        StartDefaultAnimation(collision, newPositionX, transformPositionX, positionY).
-            OnKill(() => EndDefaultAnimation(collision));
+        if (spriteShadow != null)
+            spriteShadow.enabled = false;
+        spriteShadow = brush.MakeupChangeSprite;
+        spriteShadow.enabled = true;
     }
 
-    private void StartBrushAnimations(Collider2D collision, float newPositionX, float transformPositionX, float positionY)
+    public void SetLipstick()
     {
-        StartDefaultAnimation(collision, newPositionX, transformPositionX, positionY).
-            OnComplete(() => EndAnimationsBrush(collision));
+        if (spriteLips != null)
+            spriteLips.enabled = false;
+        spriteLips = handTransform.GetComponentInChildren<Lipstick>().MakeupChangeSprite;
+        spriteLips.enabled = true;
     }
 
-    private void EndDefaultAnimation(Collider2D collision)
-    {
-        sprite.enabled = false;
-        collision.GetComponent<MakeupItems>().TweenReturnOfPositions().OnComplete(()=> NextStageButton());
-    }
+    public void HideAcne() => spriteAcne.enabled = false;
 
-    private void NextStageButton()
-    {
-        if (!isPress)
-        {
-            isPress = true;
-            nextStage.SetActive(true);
-        }
-    }
-
-    private void EndAnimationsBrush(Collider2D collision)
-    {
-        EndDefaultAnimation(collision);
-        SetShadow(collision);
-    }
-
-    private void SetShadow(Collider2D collision)
-    {
-        if (sprite != null)
-            sprite.enabled = false;
-        sprite = collision.GetComponent<Brush>().MakeupChangeColor;
-        sprite.enabled = true;
-    }
-
-    private Tween StartDefaultAnimation(Collider2D collision, float newPositionX, float transformPositionX, float positionY)
-    {
-        Vector3 originPosition = new Vector3(transform.position.x, transform.position.y + positionY, transform.position.z);
-        originPosition = VectorCalculate(originPosition, transformPositionX);
-        Vector3 newPosition = VectorCalculate(originPosition, newPositionX);
-
-        myCollider.enabled = false;
-
-        Sequence sequence = DOTween.Sequence();
-        sequence.Append(handTransform.DOMove(originPosition, duration));
-        sequence.Append(handTransform.DOMove(newPosition, duration).SetEase(Ease.Linear).SetLoops(4, LoopType.Yoyo));
-        return sequence.Play();
-    }
-
-    private Vector3 VectorCalculate(Vector3 vector, float newPositionX)
-    {
-        return vector = new Vector3(vector.x + newPositionX, vector.y, vector.z);
-    }
+    public void ShowNextStageButton() => nextStageButton.SetActive(true);
 }
