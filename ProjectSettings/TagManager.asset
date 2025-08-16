@@ -3,15 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - ShelfRight
-  - Shelf
-  - Cream
-  - Brush
-  - FaceZone
-  - Tail
-  - CanvasPalette
-  - Lipstick
+  tags: []
   layers:
   - Default
   - TransparentFX
