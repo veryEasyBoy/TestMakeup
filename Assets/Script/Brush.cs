@@ -5,18 +5,21 @@ using System.Linq;
 
 public class Brush : MakeupItems
 {
-    public Image MakeupChangeColor => makeupChangeColor;
+    public Image MakeupChangeSprite => makeupChangeSprite;
 
-    private Image makeupChangeColor;
-    private Vector3 rotate = new Vector3(0, 0, 0);
-    private Vector3 rotateEnd = new Vector3(0, 0, 90);
+    private Image makeupChangeSprite;
 
     public Tween TweenTakeItem(Image shadow)
     {
-        makeupChangeColor = shadow;
-
+        makeupChangeSprite = shadow;
+        makeupActivityController.DeactiveCream();
+        makeupActivityController.DeactiveLipstick();
         return HandChangesPosition(transform).
-            OnKill(() => { transform.DORotate(rotate, duration); ChangesParent(handRectTransform); SafePosition(); faceZone.ActivateToColliderZone(); });
+            OnKill(() =>
+            {
+                ChangesParent(handRectTransform);
+                SafePosition();
+            });
     }
 
     public Tween TakeShadow(Transform shadowTransform)
@@ -25,25 +28,8 @@ public class Brush : MakeupItems
         Vector3 newPosition = new Vector3(shadowTransform.position.x + 40f, shadowTransform.position.y - 200f, shadowTransform.position.z);
 
         mySequence.Append(HandChangesPosition(new Vector3(shadowTransform.position.x, shadowTransform.position.y - 200f, shadowTransform.position.z)));
-        mySequence.Append(HandChangesPosition(newPosition).SetLoops(4, LoopType.Yoyo));
+        mySequence.Append(HandChangesPosition(newPosition, 0.2f).SetLoops(4, LoopType.Yoyo));
         return mySequence.Play().OnComplete(() => HandChangesPosition(targetTowards));
     }
 
-    public override Tween TweenReturnOfPositions()
-    {
-        if (previousPositions.Count > 0)
-            return HandChangesPosition(previousPositions.Last()).
-                OnComplete(() =>
-                {
-                    transform.DORotate(rotateEnd, duration);
-                    RemoveLastPosition();
-                }).
-                    OnKill(() => TweenReturnOfPositions());
-        else
-        {
-            transform.SetParent(parentTransform.transform);
-            faceZone.DeactivateToColliderZone();
-            return HandChangesPosition(defaultPosition).OnKill(() => RemoveLastPosition());
-        }
-    }
 }
