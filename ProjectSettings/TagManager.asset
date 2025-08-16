@@ -11,6 +11,7 @@ TagManager:
   - FaceZone
   - Tail
   - CanvasPalette
+  - Lipstick
   layers:
   - Default
   - TransparentFX
