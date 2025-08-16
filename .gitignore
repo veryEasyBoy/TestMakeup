@@ -3,8 +3,7 @@ workspace.xml
 /obj
 /Logs
 /UserSettings
-*.cs.meta
-*.png.meta
+
 junitvmwatcher*.properties
 build.properties
 
